@@ -83,11 +83,11 @@ void edges_collection(
   std::cout << "edges collection " << edges_collection_t.Elapsed().count()
             << "s" << std::endl;
 
+  size_t count = 0;
+  auto begin = edges->begin();
   // iterate all edges
   Timer iterate_all_t;
-  auto begin = edges->begin();
   auto end = edges->end();
-  size_t count = 0;
   // iterate through edges collection
   for (auto it = begin; it != end; ++it) {
     count++;
@@ -111,7 +111,8 @@ void edges_collection(
   // neighborhood lookup
   Timer neigh_lookup_t;
   // uint64_t vertex_id = 15;
-  uint64_t vertex_id = 550430;
+  uint64_t vertex_id = 200000;
+  // uint64_t vertex_id = 550430;
   auto it_find = edges->find_src(vertex_id, begin);
   std::cout << "the edge with source = " << vertex_id << ": " << std::endl;
   do {
