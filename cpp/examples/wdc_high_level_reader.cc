@@ -21,6 +21,7 @@
 
 #include "./config.h"
 #include "gar/graph.h"
+#include "gar/util/timer.h"
 
 void vertices_collection(
     const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
@@ -30,7 +31,6 @@ void vertices_collection(
       GAR_NAMESPACE::VerticesCollection::Make(graph_info, label);
   ASSERT(!maybe_vertices_collection.has_error());
   auto vertices = maybe_vertices_collection.value();
-
   // use vertices collection
   auto count = 0;
   // iterate through vertices collection
@@ -73,14 +73,18 @@ void vertices_collection(
 void edges_collection(
     const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
   // construct edges collection
+  Timer edges_collection_t;
   std::string src_label = "node", edge_label = "links", dst_label = "node";
   auto expect = GAR_NAMESPACE::EdgesCollection::Make(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(!expect.has_error());
   auto edges = expect.value();
+  std::cout << "edges collection " << edges_collection_t.Elapsed().count()
+            << "s" << std::endl;
 
-  // use edges collection
+  // iterate all edges
+  Timer iterate_all_t;
   auto begin = edges->begin();
   auto end = edges->end();
   size_t count = 0;
@@ -95,21 +99,30 @@ void edges_collection(
     std::cout << "src=" << it.source() << ", dst=" << it.destination() << "; ";
     // access data through edge
     auto edge = *it;
-    std::cout << "src=" << edge.source() << ", dst=" << edge.destination()
+    std::cout << "src=" << edge.source() << ", dst="
+              << edge.destination()
               // << ", creationDate="
               // << edge.property<std::string>("creationDate").value()
               << std::endl;
   }
-  // find the first edge with source = 100
-  uint64_t vertex_id = 2;
+  std::cout << "iterate all " << iterate_all_t.Elapsed().count() << "s"
+            << std::endl;
+
+  // neighborhood lookup
+  Timer neigh_lookup_t;
+  // uint64_t vertex_id = 15;
+  uint64_t vertex_id = 550430;
   auto it_find = edges->find_src(vertex_id, begin);
   std::cout << "the edge with source = " << vertex_id << ": " << std::endl;
   do {
-    std::cout << "src=" << it_find.source() << ", dst=" << it_find.destination()
+    std::cout << "src=" << it_find.source() << ", dst="
+              << it_find.destination()
               // << ", creationDate="
               // << it_find.property<std::string>("creationDate").value()
               << std::endl;
   } while (it_find.next_src());
+  std::cout << "neighborhood lookup " << neigh_lookup_t.Elapsed().count() << "s"
+            << std::endl;
 
   // count
   ASSERT(count == edges->size());
@@ -121,7 +134,8 @@ int main(int argc, char* argv[]) {
   // std::string path =
   //     TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   //
-  std::string path = "/tmp/wdc-sd/wdc-sd.graph.yaml";
+  // std::string path = "/tmp/wdc-sd/wdc-sd.graph.yaml";
+  std::string path = "/tmp/wdc-pld/wdc-pld.graph.yaml";
   auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
 
   // vertices collection
