@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
 
   // save & dump
   ASSERT(!vertex_info->Dump().has_error());
-  ASSERT(vertex_info->Save(save_path + "node.vertex.yml").ok());
+  ASSERT(vertex_info->Save(save_path + "node.vertex.yaml").ok());
 
   /*------------------construct edge info------------------*/
   std::string src_label = "node", edge_label = "links", dst_label = "node",
@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 
   // save & dump
   ASSERT(!edge_info->Dump().has_error());
-  ASSERT(edge_info->Save(save_path + "node_links_node.edge.yml").ok());
+  ASSERT(edge_info->Save(save_path + "node_links_node.edge.yaml").ok());
 
   /*------------------construct graph info------------------*/
   // create graph info
@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
       graph_name, {vertex_info}, {edge_info}, save_path, version);
   // save & dump
   ASSERT(!graph_info->Dump().has_error());
-  ASSERT(graph_info->Save(save_path + graph_name + ".graph.yml").ok());
+  ASSERT(graph_info->Save(save_path + graph_name + ".graph.yaml").ok());
 
   /*------------------construct vertices------------------*/
   // construct vertices builder
@@ -122,6 +122,7 @@ int main(int argc, char* argv[]) {
     GAR_NAMESPACE::builder::Edge e(src, dst);
     ASSERT(e_builder->AddEdge(e).ok());
     cnt++;
+    // TODO(gitbuda): The below is wrong because data can't be read.
     if (cnt >= 100000000) {
       std::cout << "edge_count=" << e_builder->GetNum() << std::endl;
       ASSERT(e_builder->Dump().ok());
